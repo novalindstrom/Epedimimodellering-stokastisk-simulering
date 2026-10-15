@@ -14,21 +14,16 @@ tspan = [0, 120]
 b = 0.3 #beta är 0.3
 N = 1000 #startpersoner är 1000 varav 5 smittade (inte med)
 g = 1/7 #gamma är 1/7
-c = np.array([b/N, g]) #vår propentitestfunktions array
+alfa = 0.5 # Inkubationstid - TODO - ju mindre dagar desto fler blir smittade
+c = np.array([b/N, g, alfa]) #vår propentitestfunktions array
 
-Y0 = np.array([995, 5, 0]) #5 är smittade i start 0 resistenta, resten mottaglig
+Y0 = np.array([995, 0, 5, 0]) #5 är smittade i start 0 resistenta, resten mottaglig
 
 
-# ----------- Funktioner ---------------
+# ----------- SIR MODELLEN ---------------
 #denna kan behöva byta plats på rader och kolumner
 #just nu är rader = SIR, klm = reaktioner
 def stockiomatris():
-    A = np.array([
-        [-1,  0],  #antalet mottagliga för sjukdomen
-        [1,  -1],  #antalet smittade
-        [0,  1],  #antalet resistenta
-    ])
-    
     #test att vända på matrisen
     B = np.array([
 
@@ -55,3 +50,34 @@ def propensitetsfunktioner(Y, c):
     #print(A)
     return A
 
+#----------------- SIER MODELL ------------------------
+
+def stockiomatris_SEIR():
+    #test att vända på matrisen
+    B = np.array([
+
+        [-1, 1, 1, 0],
+        [ 0, 0, -1 , 1],
+        [0, -1, 1,0]
+    ])
+    return B
+
+def propensitetsfunktioner_SEIR(Y, c):
+    #tar ut variabler från en array och sätter värden så s(t) = y[0] osv
+    S1 = Y[0] #antal mottagliga just nu
+    E1 = Y[1]
+    I1 = Y[2] #antal smittade just nu
+    R1 = Y[3]
+    
+    c1, c2, c3 = c[0], c[1], c[2] #reaktionshastigheterna
+    
+    #faktiska derivator från uppgiften, paranteser för tydlighetens skull
+    a1 = (c1 * I1 * S1) 
+    #a2 =  (c1 * I1 * S1) - (c2 * I1)
+    a2 = c2 * I1
+    a3 = c3 * E1
+    
+    #bygger en array med alla dessa värden som retuneras
+    A = np.array([a1, a2, a3])
+    #print(A)
+    return A

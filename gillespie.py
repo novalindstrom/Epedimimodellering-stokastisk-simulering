@@ -47,7 +47,7 @@ plt.figure(figsize=(10, 6))
 # Kör 10 oberoende simuleringar och plotta dem i samma diagram
 antal_forsok = 10
 for i in range(antal_forsok):
-    tvec, Xarr = SSA(sir.propensitetsfunktioner_SEIR, sir.stockiomatris_SEIR, sir.Y0, sir.tspan, sir.c)
+    tvec, Xarr = SSA(sir.propensitetsfunktioner_SEIRDV, sir.stockiomatris_SEIRDV, sir.Y0, sir.tspan, sir.c)
     
     # Plotta bytesdjur (Y1) med heldragen linje och rovdjur (Y2) med streckad linje
     # Plotta Mottagliga (S) och Smittade (I)
@@ -63,7 +63,7 @@ for i in range(antal_forsok):
 
 plt.xlabel('Tid (t)')
 plt.ylabel('Antal individer')
-plt.title('Stokastisk simulering av SIR')
+plt.title('Stokastisk simulering av SEIRDV')
 plt.legend()
 plt.grid(True)
 plt.show()

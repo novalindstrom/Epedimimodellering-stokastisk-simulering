@@ -1,3 +1,5 @@
+
+#---testar
 #Se till att både de deterministiska modellerna (0DE)
 # och de motsvarande stokastiska modellerna (reaktionsformulering, 
 # inklusive reaktioner, stökiometrimatris och propensitetsvektor)
@@ -6,7 +8,6 @@
 
 import numpy as np
 import random
-import matplotlib.pyplot as plt
 
 # ----------- Startvärden --------------
 tspan = [0, 120]
@@ -27,23 +28,30 @@ def stockiomatris():
         [1,  -1],  #antalet smittade
         [0,  1],  #antalet resistenta
     ])
-    return A
+    
+    #test att vända på matrisen
+    B = np.array([
 
-#Y är en array som innehåller [s(t), I(t), R(t)]
+        [-1, 1, 0],
+        [ 0, -1 , 1]
+    ])
+    return B
+
+#Y är en array som innehåller [s(t), I(t), R(t)] Returvärdet är bara propfunktionerna i sin grundform
 def propensitetsfunktioner(Y, c):
     #tar ut variabler från en array och sätter värden så s(t) = y[0] osv
-    S1 = Y[0]
-    I1 = Y[1]
-    R1 = Y[2]
-    c1, c2 = c[0], c[1]
+    S1 = Y[0] #antal mottagliga just nu
+    I1 = Y[1] #antal smittade just nu
+    R1 = Y[2] #denna blir alltså inte använd, kan det vara felet?
+    c1, c2 = c[0], c[1] #reaktionshastigheterna
     
     #faktiska derivator från uppgiften, paranteser för tydlighetens skull
-    a1 = -(c1 * I1 * S1) 
-    a2 =  (c1 * I1 * S1) - (c2 * I1)
+    a1 = (c1 * I1 * S1) 
+    #a2 =  (c1 * I1 * S1) - (c2 * I1)
     a3 = c2 * I1
     
     #bygger en array med alla dessa värden som retuneras
-    A = np.array([a1, a2, a3])
-    
+    A = np.array([a1, a3])
+    #print(A)
     return A
-    
+

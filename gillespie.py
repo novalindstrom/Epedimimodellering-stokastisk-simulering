@@ -5,65 +5,9 @@
 #==================================
 import numpy as np
 import random
-#---testar
-#Se till att både de deterministiska modellerna (0DE)
-# och de motsvarande stokastiska modellerna (reaktionsformulering, 
-# inklusive reaktioner, stökiometrimatris och propensitetsvektor)
-# finns tydligt beskrivna för varje modell (SIR, SEIR etc) ni implementerar.
-# Det gäller även er egen modell om ni satsar på 5-poängsprojektet. 
-
-import numpy as np
-import random
+import SIR_modell as sir
 import matplotlib.pyplot as plt
 
-# ----------- Startvärden --------------
-tspan = [0, 120]
-b = 0.3 #beta är 0.3
-N = 1000 #startpersoner är 1000 varav 5 smittade (inte med)
-g = 1/7 #gamma är 1/7
-c = np.array([b/N, g]) #vår propentitestfunktions array
-
-Y0 = np.array([995, 5, 0]) #5 är smittade i start 0 resistenta, resten mottaglig
-
-
-# ----------- Funktioner ---------------
-#denna kan behöva byta plats på rader och kolumner
-#just nu är rader = SIR, klm = reaktioner
-def stockiomatris():
-    A = np.array([
-        [-1,  0],  #antalet mottagliga för sjukdomen
-        [1,  -1],  #antalet smittade
-        [0,  1],  #antalet resistenta
-    ])
-    
-    #test att vända på matrisen
-    B = np.array([
-
-        [-1, 1, 0],
-        [ 0, -1 , 1]
-    ])
-    return A
-
-#Y är en array som innehåller [s(t), I(t), R(t)]
-def propensitetsfunktioner(Y, c):
-    #tar ut variabler från en array och sätter värden så s(t) = y[0] osv
-    S1 = Y[0]
-    I1 = Y[1]
-    R1 = Y[2] #denna blir alltså inte använd, kan det vara felet?
-    c1, c2 = c[0], c[1]
-    #print ("hit går vi") yep
-    
-    #faktiska derivator från uppgiften, paranteser för tydlighetens skull
-    a1 = -(c1 * I1 * S1) 
-    a2 =  (c1 * I1 * S1) - (c2 * I1)
-    a3 = c2 * I1
-    
-    #bygger en array med alla dessa värden som retuneras
-    A = np.array([a1, a2, a3])
-    print(A)
-    return A
-
-#----- annan fil egentilfen
 
 def SSA(prop,stoch,X0,tspan,coeff):
     tvec=np.zeros(1)
@@ -90,8 +34,8 @@ def SSA(prop,stoch,X0,tspan,coeff):
             r=0
             while cre[r]<r2:
                 r+=1
-                X=X+sMat[r,:]
-                Xarr=np.vstack([Xarr,X])
+            X=X+sMat[r,:]
+            Xarr=np.vstack([Xarr,X])
         else: # Alla reaktionshastigheter 0
             print('Simuleringen avslutad vid t=', t)
             return tvec, Xarr
@@ -100,22 +44,26 @@ def SSA(prop,stoch,X0,tspan,coeff):
 
 plt.figure(figsize=(10, 6))
 
-# Kör 5 oberoende simuleringar och plotta dem i samma diagram
-antal_forsok = 5
+# Kör 10 oberoende simuleringar och plotta dem i samma diagram
+antal_forsok = 10
 for i in range(antal_forsok):
-    tvec, Xarr = SSA(propensitetsfunktioner, stockiomatris, Y0, tspan, c)
+    tvec, Xarr = SSA(sir.propensitetsfunktioner, sir.stockiomatris, sir.Y0, sir.tspan, sir.c)
     
     # Plotta bytesdjur (Y1) med heldragen linje och rovdjur (Y2) med streckad linje
+    # Plotta Mottagliga (S) och Smittade (I)
     if i == 0:
-        plt.plot(tvec, Xarr[:, 0], 'b-', label='Bytesdjur (Y1)', alpha=0.5)
-        plt.plot(tvec, Xarr[:, 1], 'r--', label='Rovdjur (Y2)', alpha=0.5)
+        plt.plot(tvec, Xarr[:, 0], 'b-', label='Mottagliga (S)', alpha=0.5)
+        plt.plot(tvec, Xarr[:, 1], 'r-', label='Smittade (I)', alpha=0.5)
+        plt.plot(tvec, Xarr[:, 2], 'g-', label='Resistenta (R)', alpha=0.5) # Lägg till R också om du vill se alla tre!
+
     else:
         plt.plot(tvec, Xarr[:, 0], 'b-', alpha=0.3)
         plt.plot(tvec, Xarr[:, 1], 'r--', alpha=0.3)
+        plt.plot(tvec, Xarr[:, 2], 'g-', alpha=0.3)
 
 plt.xlabel('Tid (t)')
 plt.ylabel('Antal individer')
-plt.title('Stokastisk simulering av Predator-Byte modell (Gillespie)')
+plt.title('Stokastisk simulering av SIR')
 plt.legend()
 plt.grid(True)
 plt.show()
